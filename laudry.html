@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Laundry</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+        .form-container, .table-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        label, select, input, button, table {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sistem Informasi Laundry</h1>
+
+
+    <div class="form-container">
+        <h2>Input Data Order Pelanggan</h2>
+        <form id="orderForm">
+            <label>Nama Pelanggan:</label>
+            <input type="text" id="customerName" required>
+            
+            <label>Jenis Layanan:</label>
+            <select id="serviceType" required>
+                <option value="cuci">Cuci</option>
+                <option value="setrika">Setrika</option>
+                <option value="cuciSetrika">Cuci & Setrika</option>
+            </select>
+            
+            <label>Jumlah Pakaian (kg):</label>
+            <input type="number" id="clothesAmount" required>
+            
+            <label>Tanggal Layanan:</label>
+            <input type="date" id="serviceDate" required>
+            
+            <label>Status Pembayaran:</label>
+            <select id="paymentStatus" required>
+                <option value="Belum Lunas">Belum Lunas</option>
+                <option value="Lunas">Lunas</option>
+            </select>
+            
+            <button type="submit">Submit Order</button>
+        </form>
+    </div>
+
+
+    <div class="table-container">
+        <h2>Riwayat Transaksi</h2>
+        <table id="transactionHistory">
+            <thead>
+                <tr>
+                    <th>Nama Pelanggan</th>
+                    <th>Jenis Layanan</th>
+                    <th>Jumlah Pakaian (kg)</th>
+                    <th>Tanggal Layanan</th>
+                    <th>Total Harga (Rp)</th>
+                    <th>Status Pembayaran</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+
+    <div class="form-container">
+        <h2>Manajemen Stok</h2>
+        <label>Stok Bahan Pencuci (kg):</label>
+        <input type="number" id="stokBahan" value="100" disabled>
+        <button onclick="updateStock(-5)">Kurangi 5 kg</button>
+        <button onclick="updateStock(5)">Tambah 5 kg</button>
+    </div>
+
+
+    <div class="form-container">
+        <h2>Manajemen SDM</h2>
+        <form id="employeeForm">
+            <label>Nama Pegawai:</label>
+            <input type="text" id="employeeName" required>
+            
+            <label>Jam Kerja:</label>
+            <input type="number" id="workHours" required>
+            
+            <button type="submit">Tambah Pegawai</button>
+        </form>
+    </div>
+
+    <div class="table-container">
+        <h2>Daftar Pegawai</h2>
+        <table id="employeeList">
+            <thead>
+                <tr>
+                    <th>Nama Pegawai</th>
+                    <th>Jam Kerja (Jam)</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        const PRICE_PER_KG = {
+            cuci: 5000,
+            setrika: 4000,
+            cuciSetrika: 8000
+        };
+
+        document.getElementById('orderForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('customerName').value;
+            const service = document.getElementById('serviceType').value;
+            const amount = parseFloat(document.getElementById('clothesAmount').value);
+            const date = document.getElementById('serviceDate').value;
+            const paymentStatus = document.getElementById('paymentStatus').value;
+            const servicePrice = PRICE_PER_KG[service];
+            const totalPrice = amount * servicePrice;
+
+            const table = document.getElementById('transactionHistory').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            newRow.insertCell(0).innerText = name;
+            newRow.insertCell(1).innerText = service === 'cuci' ? 'Cuci' : service === 'setrika' ? 'Setrika' : 'Cuci & Setrika';
+            newRow.insertCell(2).innerText = amount;
+            newRow.insertCell(3).innerText = date;
+            newRow.insertCell(4).innerText = totalPrice.toLocaleString('id-ID');
+            newRow.insertCell(5).innerText = paymentStatus;
+
+            document.getElementById('orderForm').reset();
+        });
+
+        // Manajemen Stok
+        function updateStock(amount) {
+            const stockElement = document.getElementById('stokBahan');
+            let stock = parseInt(stockElement.value);
+            stock += amount;
+            stockElement.value = stock < 0 ? 0 : stock;
+        }
+
+        document.getElementById('employeeForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const employeeName = document.getElementById('employeeName').value;
+            const workHours = document.getElementById('workHours').value;
+
+            const employeeTable = document.getElementById('employeeList').getElementsByTagName('tbody')[0];
+            const newRow = employeeTable.insertRow();
+            newRow.insertCell(0).innerText = employeeName;
+            newRow.insertCell(1).innerText = workHours;
+
+            document.getElementById('employeeForm').reset();
+        });
+    </script>
+</body>
+</html>
